@@ -120,7 +120,7 @@ def loglikelihood_ratio(loglikelihoods1, loglikelihoods2, nested=False, normaliz
 # Both cdf and ccdf used to have the keyword 'survival' which controlled
 # whether you get the cdf or ccdf, but since we already have two functions
 # having that is redundant and confusing.
-def cdf(data, xmin=None, xmax=None):
+def cdf(data,use_old_cdf, xmin=None, xmax=None):
     """
     Compute the cumulative distribution function (CDF) of the data.
 
@@ -163,8 +163,11 @@ def cdf(data, xmin=None, xmax=None):
     all_unique = not any(data[:-1]==data[1:])
     if all_unique:
         # Note the +1; see EliasL's Issue #111
-        #CDF = np.arange(1, n+1) / n
-        CDF = np.arange(0, n) / n
+
+        if use_old_cdf:
+            CDF = np.arange(0, n) / n
+        else:
+            CDF = np.arange(1, n+1) / n
 
         unique_data = data
 
@@ -177,8 +180,10 @@ def cdf(data, xmin=None, xmax=None):
         # calculate the CDF of data with repeated values comes from Adam
         # Ginsburg's plfit code, specifically:
         # https://github.com/keflavich/plfit/commit/453edc36e4eb35f35a34b6c792a6d8c7e848d3b5#plfit/plfit.py
-        #CDF = np.searchsorted(data, data, side='right') / n
-        CDF = np.searchsorted(data, data, side='left') / n
+        if use_old_cdf:
+            CDF = np.searchsorted(data, data, side='left') / n
+        else:
+            CDF = np.searchsorted(data, data, side='right') / n
 
         # Now we remove the duplicate points
         unique_data, unique_indices = np.unique(data, return_index=True)
@@ -187,7 +192,7 @@ def cdf(data, xmin=None, xmax=None):
     return unique_data, CDF
 
 
-def ccdf(data, xmin=None, xmax=None):
+def ccdf(data,use_old_cdf, xmin=None, xmax=None):
     """
     Compute the complementary cumulative distribution function (CCDF) of the data.
 
@@ -212,7 +217,7 @@ def ccdf(data, xmin=None, xmax=None):
         The portion of the data that is greater than X.
     """
     # Calculate the cdf and take 1 - cdf
-    unique_data, CDF = cdf(data, xmin=xmin, xmax=xmax)
+    unique_data, CDF = cdf(data, use_old_cdf, xmin=xmin, xmax=xmax)
 
     return unique_data, 1 - CDF
 

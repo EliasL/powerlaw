@@ -145,6 +145,7 @@ class Distribution(object):
     DEFAULT_PARAMETER_RANGES = {}
 
     def __init__(self,
+                 use_old_cdf=None,
                  data=None,
                  xmin=None,
                  xmax=None,
@@ -169,6 +170,9 @@ class Distribution(object):
         # the values created in the subclass)
         # And the name of the distribution
         #name = 'name'
+
+        assert use_old_cdf is not None
+        self.use_old_cdf = use_old_cdf
 
         self.verbose = verbose
 
@@ -821,7 +825,7 @@ class Distribution(object):
         renamed ``compute_distance_metrics()`` because it computes several
         distance metrics (including KS).
         """
-        compute_distance_metrics(data)
+        self.compute_distance_metrics(data)
         return self.D
 
     
@@ -911,7 +915,7 @@ class Distribution(object):
 
         else:
             # If we don't have the cdf already computed, we compute it now
-            bins, Actual_CDF = cdf(data)
+            bins, Actual_CDF = cdf(data, self.use_old_cdf)
 
         # Now compute the theoretical cdf of the fit distribution
         Theoretical_CDF = self.cdf(bins)
