@@ -1,5 +1,10 @@
 from matplotlib import pyplot as plt
+
 import powerlaw
+# Remember to run as module so that the current 
+# code is being run: python -m testing.test_CDF
+
+
 from tqdm import tqdm
 
 # Set seed for reproducibility
